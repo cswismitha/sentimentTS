@@ -1,92 +1,263 @@
-# Lambda Function: [sentimentanalysis]
-# Azure Function: [sentimentanalysis]
+# Sentiment Analysis Service
 
-## Overview
+A TypeScript-based serverless application that fetches app reviews from iTunes RSS Feed API, performs sentiment analysis, and stores results in cloud databases. The service supports both AWS Lambda and Azure Functions deployment with corresponding cloud services.
 
-This function, named `[sentimentanalysis]`, serves the purpose of getting the sentiment analysis summary of the app reviews from iTunes RSS Feed API for specific appId configured with HTTP triggers. It is built using Javascript running on Node runtime environment and deployed within the AWS Lambda/Azure Function App environment.
+## 🏗️ Architecture
 
-## Functionality
+This application follows a multi-cloud architecture pattern with:
 
-This function performs the following actions:
+- **Cloud Providers**: AWS Lambda / Azure Functions
+- **Databases**: DynamoDB (AWS) / Cosmos DB (Azure)
+- **Queues**: SQS (AWS) / Storage Queue (Azure)
+- **Secrets Management**: AWS Secrets Manager / Azure Key Vault
+- **Language**: TypeScript with Node.js runtime
 
-1.  Fetches App reviews and stores the reviews in Dynamo DB/Cosmos DB respectively for AWS Lambda/Azure Function
-2.  Generate summary using node-summarizer package
-3.  Send notification to the SQS/Storage Queue once the summary is complete.
+## 🚀 Features
 
-## Deployment
+- **Multi-Cloud Support**: Deploy to either AWS or Azure with platform-specific configurations
+- **iTunes Integration**: Fetches app reviews from iTunes RSS Feed API
+- **Sentiment Analysis**: Analyzes review sentiment using the `sentiment` library
+- **Text Summarization**: Generates summaries using `node-summarizer`
+- **Cloud Storage**: Stores reviews and summaries in cloud databases
+- **Queue Notifications**: Sends completion notifications via cloud queues
+- **TypeScript**: Fully typed codebase with interfaces and type safety
 
-This function can be deployed using various methods, including:
+## 📁 Project Structure
 
-* **AWS?Azure Management Console:** Manual creation and configuration through the AWS/Azure web interface.
-* **Infrastructure as Code (IaC) tools (e.g., Terraform, Pulumi):** Third-party tools for managing cloud infrastructure.
+```
+src/
+├── aws/                    # AWS-specific implementations
+│   ├── DynamoDBProvider.ts
+│   ├── SecretsManagerProvider.ts
+│   └── SQSProvider.ts
+├── azure/                  # Azure-specific implementations
+│   ├── CosmosDBProvider.ts
+│   ├── KeyVaultProvider.ts
+│   ├── StorageQueueProvider.ts
+│   ├── function.json
+│   └── index.ts
+├── common/                 # Shared business logic
+│   ├── itunes.ts          # iTunes API integration
+│   ├── summarize.ts       # Text summarization
+│   └── types.ts
+├── config/                 # Configuration management
+│   └── config.ts
+├── interfaces/             # TypeScript interfaces
+│   ├── IDatabaseProvider.ts
+│   ├── IQueueProvider.ts
+│   └── ISecretsProvider.ts
+├── services/               # Business services
+│   └── ReviewService.ts
+├── types/                  # Type definitions
+│   └── node-summarizer.d.ts
+├── utils/                  # Utility functions
+│   └── index.ts
+└── handler.ts             # Main entry point
+```
 
-**Deployment Package:**
+## 🔧 Configuration
 
-The function code and its dependencies (if any) are packaged into a ZIP file named `sentimentanalysis.zip` (or a similar name depending on your deployment method).
+### Environment Variables
 
-## Configuration
+The application uses the following environment variables:
 
-The following environment variables can be configured for this Lambda function:
+#### Common
+- `PLATFORM`: Target platform (`aws` or `azure`, default: `azure`)
+- `APPID`: iTunes App ID to fetch reviews for (default: `389801252`)
 
-* `[DB_ENDPOINT]`: DB Endpoint URL of Cosmos DB
-* `[DB_KEY]`: DB KEY of Cosmos DB
-* `[DB_ID]` : Database ID of Cosmos DB
-* `[DB_CONTAINERID]` : Cosmos Table Name for storing App reviews
-* `[DB_SUMMCONTAINERID]` : Cosmos Table Name for storing App review summary
-* `[REGION]` : AWS Region Name
-* `[SQSURL]` : Amazon SQS URL
-* `[DB_REVIEW_TABLE]` : Dynamo Table Name for storing App reviews
-* `[DB_SUMM_TABLE]` : Dynamo Table Name for storing App review summary
-* `[AZQUEUE_NAME]` : Azure Storage Queue Name
-* `[AZQUEUE_URL]` : Azure Storage Queue URL
+#### AWS Configuration
+- `REGION`: AWS region (default: `eu-north-1`)
+- `SQSURL`: Amazon SQS queue URL
+- `DB_REVIEW_TABLE`: DynamoDB table for storing reviews (default: `customerreviews`)
+- `DB_SUMM_TABLE`: DynamoDB table for storing summaries (default: `reviewsummary`)
 
-These variables can be set through the AWS/Azure Management Console, AWS CLI, or your chosen IaC tool.
+#### Azure Configuration
+- `DB_ENDPOINT`: Cosmos DB endpoint URL
+- `DB_KEY`: Cosmos DB access key
+- `DB_ID`: Cosmos DB database ID (default: `cosmicworks`)
+- `DB_CONTAINERID`: Cosmos DB container for reviews (default: `customerreviews`)
+- `DB_SUMMCONTAINERID`: Cosmos DB container for summaries (default: `reviewsummary`)
+- `AZQUEUE_NAME`: Azure Storage Queue name (default: `js-queue-items`)
+- `AZQUEUE_URL`: Azure Storage Queue URL
+- `KEY_VAULT_URL`: Azure Key Vault URL
 
-## Permissions
+## 🛠️ Installation & Setup
 
-The execution role associated with this Lambda function (`arn:aws:iam::[your_account_id]:role/[your_lambda_execution_role]`) has the following AWS managed policies and/or custom permissions attached:
+### Prerequisites
+- Node.js 18+ 
+- TypeScript
+- AWS CLI (for AWS deployment) or Azure CLI (for Azure deployment)
 
-* `AWSLambdaBasicExecutionRole`: Provides basic permissions for a Lambda function to write logs to CloudWatch Logs.
-* `AmazonDynamoDBFullAccess`: Provides Lambda function to do CRUD operations with Dynamo DB
-* `AmazonSQSFullAccess`: Provides Lambda function to add/remove messages into SQS
+### Install Dependencies
+```bash
+npm install
+```
 
-## Input and Output
+### Build the Project
+```bash
+npm run build
+```
 
-**Input:**
+## 📦 Dependencies
 
-The structure of the input event passed to this Lambda function depends on the event source that triggers it. Examples include:
+### Runtime Dependencies
+- `@aws-sdk/client-dynamodb`: AWS DynamoDB client
+- `@aws-sdk/client-sqs`: AWS SQS client
+- `@azure/cosmos`: Azure Cosmos DB client
+- `@azure/functions`: Azure Functions runtime
+- `@azure/storage-queue`: Azure Storage Queue client
+- `axios`: HTTP client for iTunes API
+- `node-summarizer`: Text summarization library
+- `sentiment`: Sentiment analysis library
 
-* **API Gateway:** An event object containing details about the HTTP request (headers, body, query parameters, etc.).
-    ```json
-    {
-      "resource": "/my/path",
-      "path": "/my/path",
-      "httpMethod": "POST",
-      "headers": {
-        "Accept": "*/*",
-        "Content-Type": "application/json"
-      },
-      "body": "{\"key\": \"value\"}",
-      "isBase64Encoded": false
-    }
-    ```
+### Development Dependencies
+- `typescript`: TypeScript compiler
+- `@types/*`: Type definitions for various libraries
 
-**Output:**
+## 🚀 Deployment
 
-The output of the Lambda function depends on how it is invoked and integrated with other services. Common output formats include:
+### AWS Lambda Deployment
 
-* **API Gateway Integration:** A JSON object representing the HTTP response (status code, headers, body).
-    ```json
-    {
-      "statusCode": 200,
-      "headers": {
-        "Content-Type": "application/json"
-      },
-      "body": "{\"message\": \"Success!\"}"
-    }
-    ```
+1. Set the platform environment variable:
+   ```bash
+   export PLATFORM=aws
+   ```
 
-## Logging and Monitoring
+2. Configure AWS credentials and deploy using your preferred method:
+   - AWS SAM
+   - Serverless Framework
+   - AWS CDK
+   - Manual ZIP upload
 
-This Lambda function utilizes AWS CloudWatch Logs for logging. You can find detailed logs of the function's execution in the CloudWatch Logs service under the log group `/aws/lambda/[YourFunctionName]`.
-For Azure, you can view logs in Application Insights.
+### Azure Functions Deployment
+
+1. Set the platform environment variable:
+   ```bash
+   export PLATFORM=azure
+   ```
+
+2. Deploy using Azure Functions Core Tools:
+   ```bash
+   func azure functionapp publish <your-function-app-name>
+   ```
+
+## 🔄 Workflow
+
+1. **Trigger**: HTTP request triggers the function
+2. **Fetch Reviews**: Retrieves app reviews from iTunes RSS Feed API
+3. **Store Reviews**: Saves individual reviews to cloud database
+4. **Analyze Sentiment**: Processes reviews for sentiment analysis
+5. **Generate Summary**: Creates a summary of all reviews
+6. **Store Summary**: Saves the summary to cloud database
+7. **Queue Notification**: Sends completion message to cloud queue
+8. **Response**: Returns the sentiment analysis summary
+
+## 📊 Data Models
+
+### Review Entry
+```typescript
+interface AppReviewEntry {
+    content: {
+        label: string;
+        attributes: {
+            type: string;
+        };
+    };
+}
+```
+
+### AWS DynamoDB Schema
+```
+Reviews Table:
+- PK: "APP#{appId}"
+- SK: "CR#{timestamp}"
+- id, title, content, updated
+
+Summary Table:
+- PK: "APP#{appId}"
+- SK: "SUMM#{timestamp}"
+- summary, updated
+```
+
+### Azure Cosmos DB Schema
+```
+Reviews Container:
+- id, title, appId, content, updated
+
+Summary Container:
+- id (appId), summary, updated
+```
+
+## 🔐 Security & Permissions
+
+### AWS IAM Permissions
+- `AWSLambdaBasicExecutionRole`
+- `AmazonDynamoDBFullAccess`
+- `AmazonSQSFullAccess`
+
+### Azure Permissions
+- Cosmos DB read/write access
+- Storage Queue access
+- Key Vault access (if using secrets)
+
+## 📝 API
+
+### HTTP Trigger
+
+**Endpoint**: Configured based on deployment
+**Method**: POST
+**Content-Type**: application/json
+
+**Response**:
+```json
+{
+  "statusCode": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*"
+  },
+  "body": {
+    "message": "sentiment analysis summary",
+    "input": "request body"
+  }
+}
+```
+
+## 🔍 Monitoring & Logging
+
+### AWS
+- **CloudWatch Logs**: Function execution logs
+- **CloudWatch Metrics**: Performance metrics
+- **X-Ray**: Distributed tracing (if enabled)
+
+### Azure
+- **Application Insights**: Comprehensive monitoring
+- **Azure Monitor**: Metrics and alerts
+- **Function App Logs**: Execution logs
+
+## 🧪 Testing
+
+```bash
+npm test
+```
+
+*Note: Test implementation is pending. Consider adding unit tests for services and integration tests for cloud providers.*
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+ISC License
+
+## 🔗 Related Documentation
+
+- [iTunes RSS Feed API](https://rss.applemarketingtools.com/)
+- [AWS Lambda Documentation](https://docs.aws.amazon.com/lambda/)
+- [Azure Functions Documentation](https://docs.microsoft.com/en-us/azure/azure-functions/)
+- [TypeScript Documentation](https://www.typescriptlang.org/docs/)

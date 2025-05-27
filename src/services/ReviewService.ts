@@ -3,6 +3,7 @@ import { IQueueProvider } from '../interfaces/IQueueProvider';
 import { stringToTimeString } from '../utils';
 import { AppReviewEntry, getAppReviews, getSentimentAnalysis } from "../common/itunes";
 import config from "../config/config";
+import { ISecretsProvider } from '../interfaces/ISecretsProvider';
 
 export class ReviewService {
     
@@ -51,6 +52,7 @@ export class ReviewService {
                     const newItem = {
                         id: item.id.label,
                         title: item.title.label,
+                        appId: appId,
                         content: item.content.label,
                         updated: item.updated.label,
                     };

@@ -1,6 +1,7 @@
 import { DynamoDBProvider } from "./aws/DynamoDBProvider";
 import { SQSProvider } from "./aws/SQSProvider";
 import { CosmosDBProvider } from "./azure/CosmosDBProvider";
+import { KeyVaultProvider } from "./azure/KeyVaultProvider";
 import { StorageQueueProvider } from "./azure/StorageQueueProvider";
 import { IDatabaseProvider } from "./interfaces/IDatabaseProvider";
 import { IQueueProvider } from "./interfaces/IQueueProvider";
@@ -25,9 +26,13 @@ export const handler = async ( event: any, context: any ): Promise<any> => {
 
   try {    
     let requestBody: any = null;
-    let dbProvider: IDatabaseProvider = new CosmosDBProvider();
+    let dbProvider: IDatabaseProvider = new DynamoDBProvider();
     let qProvider: IQueueProvider = new StorageQueueProvider();
-    if (platform === 'azure') {      
+    // Handling request based on platform
+    if (platform === 'azure') {  
+      let secProvider = new KeyVaultProvider();
+      //const connectionString = await secProvider.getSecret('dbconnstring');
+      //console.log('Connection string:: ', connectionString);
       dbProvider = new CosmosDBProvider();
       qProvider = new StorageQueueProvider();
       try {
@@ -53,8 +58,7 @@ export const handler = async ( event: any, context: any ): Promise<any> => {
     console.log('Processed');
     responseBody = {
         message: sentAnalysis,
-        input: requestBody,
-        lambdaRequestId: context.awsRequestId,
+        input: requestBody
       };
     
   } catch (error: any) {
