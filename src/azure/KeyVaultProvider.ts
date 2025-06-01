@@ -10,7 +10,7 @@ export class KeyVaultProvider implements ISecretsProvider {
     constructor() {
         const url = config.vault;
         const credential = new DefaultAzureCredential({
-            managedIdentityClientId: 'cc74bc7c-f286-4919-9fda-31d37161d9ca'
+            managedIdentityClientId: config.clientID
         });
         this.client = new SecretClient(url, credential);
     }

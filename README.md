@@ -80,6 +80,7 @@ The application uses the following environment variables:
 - `AZQUEUE_NAME`: Azure Storage Queue name (default: `js-queue-items`)
 - `AZQUEUE_URL`: Azure Storage Queue URL
 - `KEY_VAULT_URL`: Azure Key Vault URL
+- `CLIENT_ID`: Managed Identity Client ID
 
 ## 🛠️ Installation & Setup
 
@@ -207,6 +208,12 @@ Summary Container:
 **Endpoint**: Configured based on deployment
 **Method**: POST
 **Content-Type**: application/json
+
+**Request**:
+```json
+{
+    "appId":"389801252" // AppID to fetch reviews
+}
 
 **Response**:
 ```json

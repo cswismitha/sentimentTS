@@ -3,7 +3,7 @@ import { IQueueProvider } from '../interfaces/IQueueProvider';
 import { stringToTimeString } from '../utils';
 import { AppReviewEntry, getAppReviews, getSentimentAnalysis } from "../common/itunes";
 import config from "../config/config";
-import { ISecretsProvider } from '../interfaces/ISecretsProvider';
+import { randomUUID } from 'crypto';
 
 export class ReviewService {
     
@@ -12,15 +12,15 @@ export class ReviewService {
         private qProvider: IQueueProvider
     ) {}
 
-    async process() {
-        const reviews:AppReviewEntry[] | undefined = await getAppReviews();
-        await this.saveAppReviews(config.appId, reviews, config.cosmosdb.containerId);
+    async process(appId: string) {
+        const reviews:AppReviewEntry[] | undefined = await getAppReviews(appId);
+        await this.saveAppReviews(appId, reviews, config.cosmosdb.containerId);
         console.log('Saved reviews');
         let sentAnalysis = '';
         if (reviews) {
             sentAnalysis = await getSentimentAnalysis(reviews);
             console.log('summary retrieved', sentAnalysis);            
-            await this.saveSummary(config.appId, sentAnalysis, config.cosmosdb.summcontainerId);
+            await this.saveSummary(appId, sentAnalysis, config.cosmosdb.summcontainerId);
             await this.qProvider.sendMessageToQueue(JSON.stringify({ message: 'Done'}));
         }
         return sentAnalysis;
@@ -76,7 +76,8 @@ export class ReviewService {
             };                
         } else if (platform === 'azure') {
             newItem = {
-                id: config.appId,
+                id: randomUUID(),
+                appId,
                 summary,
                 updated: new Date().getTime()
             };

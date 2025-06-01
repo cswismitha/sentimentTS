@@ -21,10 +21,10 @@ export interface AppReviewEntry {
 
 const sentiment = new Sentiment();
 
-async function getAppReviews(): Promise<AppReviewEntry[] | undefined> {
+async function getAppReviews(appId: string): Promise<AppReviewEntry[] | undefined> {
     try {
         // You might want to define a more specific interface for the full response if you use more of it
-        const response = await axios.get<{ feed: { entry: AppReviewEntry[] } }>(`https://itunes.apple.com/us/rss/customerreviews/id=${config.appId}/json`);
+        const response = await axios.get<{ feed: { entry: AppReviewEntry[] } }>(`https://itunes.apple.com/us/rss/customerreviews/id=${appId}/json`);
         console.log('Received app reviews');
         const feeds: AppReviewEntry[] = response.data.feed.entry;
         return feeds;

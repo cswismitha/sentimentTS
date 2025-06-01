@@ -31,9 +31,8 @@ export const handler = async ( event: any, context: any ): Promise<any> => {
     // Handling request based on platform
     if (platform === 'azure') {  
       let secProvider = new KeyVaultProvider();
-      //const connectionString = await secProvider.getSecret('dbconnstring');
-      //console.log('Connection string:: ', connectionString);
-      dbProvider = new CosmosDBProvider();
+      const connectionString = await secProvider.getSecret('dbconnstring');
+      dbProvider = new CosmosDBProvider(connectionString);
       qProvider = new StorageQueueProvider();
       try {
           requestBody = await event.json();
@@ -53,8 +52,11 @@ export const handler = async ( event: any, context: any ): Promise<any> => {
     } else {
       console.log("Platform not supported");
     }
+    console.log("APP ID found: ", requestBody.appId);
+    if (!requestBody.appId) throw new Error("App Id not in the request");
+    
     const reviewService = new ReviewService(dbProvider, qProvider);
-    const sentAnalysis = await reviewService.process();
+    const sentAnalysis = await reviewService.process(requestBody.appId);
     console.log('Processed');
     responseBody = {
         message: sentAnalysis,
