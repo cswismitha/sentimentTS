@@ -186,8 +186,11 @@ Reviews Container:
 - id, title, appId, content, updated
 
 Summary Container:
-- id (appId), summary, updated
+- id, appId, summary, updated
 ```
+
+### Azure Key Vault
+- `dbconnstring` - DB Connection string
 
 ## 🔐 Security & Permissions
 
