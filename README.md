@@ -38,6 +38,7 @@ src/
 │   └── index.ts
 ├── common/                 # Shared business logic
 │   ├── itunes.ts          # iTunes API integration
+│   ├── openrouterclient.ts   # Open router LLM API integration
 │   ├── summarize.ts       # Text summarization
 │   └── types.ts
 ├── config/                 # Configuration management
@@ -81,6 +82,7 @@ The application uses the following environment variables:
 - `AZQUEUE_URL`: Azure Storage Queue URL
 - `KEY_VAULT_URL`: Azure Key Vault URL
 - `CLIENT_ID`: Managed Identity Client ID
+- `OPENROUTER_API_KEY`: Open Router API Key
 
 ## 🛠️ Installation & Setup
 
