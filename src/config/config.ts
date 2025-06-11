@@ -23,8 +23,10 @@ interface AppConfig {
     sqsURL: string;
     ddb: DynamoDBConfig;
     azqueue: AzureQueueConfig;
-    vault: string,
-    clientID: string
+    vault: string;
+    clientID: string;
+    geminiApiKey: string;
+    openrouterApiKey: string;
 }
 
 const config: AppConfig = {
@@ -46,7 +48,9 @@ const config: AppConfig = {
         queueurl: process.env.AZQUEUE_URL
     },
     vault: process.env.KEY_VAULT_URL,
-    clientID: process.env.CLIENT_ID
+    clientID: process.env.CLIENT_ID,
+    geminiApiKey: process.env.GEMINI_KEY,
+    openrouterApiKey: process.env.OPENROUTER_API_KEY
 };
 
 export default config;

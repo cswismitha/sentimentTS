@@ -6,6 +6,7 @@ import { StorageQueueProvider } from "./azure/StorageQueueProvider";
 import { IDatabaseProvider } from "./interfaces/IDatabaseProvider";
 import { IQueueProvider } from "./interfaces/IQueueProvider";
 import { ReviewService } from "./services/ReviewService";
+import config from "./config/config";
 
 /**
  * A simple Lambda function that processes an API Gateway proxy event.
@@ -31,8 +32,8 @@ export const handler = async ( event: any, context: any ): Promise<any> => {
     // Handling request based on platform
     if (platform === 'azure') {  
       let secProvider = new KeyVaultProvider();
-      const connectionString = await secProvider.getSecret('dbconnstring');
-      dbProvider = new CosmosDBProvider(connectionString);
+      //const connectionString = await secProvider.getSecret('dbconnstring');
+      dbProvider = new CosmosDBProvider(config.cosmosdb.endpoint);
       qProvider = new StorageQueueProvider();
       try {
           requestBody = await event.json();

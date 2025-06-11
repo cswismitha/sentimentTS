@@ -1,7 +1,7 @@
 import { IDatabaseProvider } from '../interfaces/IDatabaseProvider';
 import { IQueueProvider } from '../interfaces/IQueueProvider';
 import { stringToTimeString } from '../utils';
-import { AppReviewEntry, getAppReviews, getSentimentAnalysis } from "../common/itunes";
+import { AppReviewEntry, getAppReviews, getORSentimentAnalysis, getSentimentAnalysis } from "../common/itunes";
 import config from "../config/config";
 import { randomUUID } from 'crypto';
 

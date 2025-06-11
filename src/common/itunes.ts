@@ -1,7 +1,7 @@
 import axios from 'axios';
 import Sentiment from 'sentiment';
 import * as summarizer from './summarize'; // Assuming summarize.ts exports functions
-import config from '../config/config'; // Assuming config.ts exports an object
+import { summarize } from './openrouterclient';
 
 // Define an interface for the structure of a single review entry from the iTunes API
 export interface AppReviewEntry {
@@ -11,12 +11,12 @@ export interface AppReviewEntry {
             type: string;
         };
     };
-    // Add other properties you might use from the entry if needed, e.g.:
-    // 'im:name': { label: string };
-    // 'im:rating': { label: string };
-    // id: { label: string };
-    // title: { label: string };
-    // author: { name: { label: string } };
+    id: {
+        label: string; // The actual review content
+        attributes: {
+            type: string;
+        };
+    };
 }
 
 const sentiment = new Sentiment();
@@ -55,7 +55,46 @@ async function getSentimentAnalysis(feeds: AppReviewEntry[]): Promise<any | unde
     return summary;
 }
 
+async function getORSentimentAnalysis(feeds: AppReviewEntry[]): Promise<any | undefined> { // Assuming summarizer.getReviewSummary returns 'any' or a specific type
+    let summary: any; // Type for summary depends on what summarizer.getReviewSummary returns
+    try {
+        let comment: string = '';
+        let reviews: OReview[] = [];
+        feeds.forEach((element: AppReviewEntry) => {
+            // Ensure element.content exists and has a label property
+            if (element.content && element.content.label) {
+                comment += ". " + element.content.label;
+            }
+            reviews.push({id: element.id.label, text: element.content.label});
+        });
+        summary = await summarize(comment);
+        console.log('summary received', summary);
+    } catch (error: any) {
+        console.error('Error getting sentiment analysis:', error.message || error);
+        return undefined;
+    }
+    return summary;
+}
+
+interface SentimentSummary {
+reviewId: string;
+sentiment: string;
+summary: string;
+}
+
+interface Review {
+reviewId: string;
+comment: string;
+}
+
+interface OReview {
+    id: string;
+    text: string;
+}
+
+
 export {
     getAppReviews,
-    getSentimentAnalysis
+    getSentimentAnalysis,
+    getORSentimentAnalysis
 };

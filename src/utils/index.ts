@@ -21,14 +21,3 @@ export function stringToTimeString(dateString: string): number | string {
     return `Error: Invalid date string format - ${error.message}`;
   }
 }
-
-// If you are using ES Modules (e.g., with 'type: "module"' in package.json or in frontend frameworks):
-// export { stringToTimeString };
-
-// --- Example Usage ---
-console.log(`"2023-01-15T10:00:00Z" -> ${stringToTimeString("2023-01-15T10:00:00Z")}`);
-console.log(`"2024-05-21" -> ${stringToTimeString("2024-05-21")}`);
-console.log(`"invalid-date-string" -> ${stringToTimeString("invalid-date-string")}`);
-console.log(`null -> ${stringToTimeString(null as any)}`); // Simulating null input (TS would warn normally)
-console.log(`undefined -> ${stringToTimeString(undefined as any)}`); // Simulating undefined input
-console.log(`"" -> ${stringToTimeString("")}`);
