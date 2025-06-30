@@ -37,6 +37,7 @@ export class ReviewService {
                         "SK": { S: "CR#" + stringToTimeString(ts) },
                         "id": { S:item.id.label },
                         "title": { S : item.title.label },
+                        "sentiment": {S : item.sentiment },
                         "content": { S : item.content.label },
                         "updated": { S : item.updated.label }
                     };
@@ -53,6 +54,7 @@ export class ReviewService {
                         id: item.id.label,
                         title: item.title.label,
                         appId: appId,
+                        sentiment: item.sentiment,
                         content: item.content.label,
                         updated: item.updated.label,
                     };
